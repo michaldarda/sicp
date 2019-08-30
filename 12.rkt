@@ -2,7 +2,8 @@
 
 (define (assert-eql actual expected)
   (if (not (= expected actual))
-      (error "Does not match condition, expected: " expected " actual: " actual)))
+      (error "Does not match condition, expected: "
+             expected " actual: " actual)))
 
 (define (factorial n)
   (if (= n 0) 1
@@ -28,3 +29,23 @@
 (assert-eql (fib 2) 2)
 (assert-eql (fib 5) 8)
 (assert-eql (fib 20) 10946)
+
+(define (f-recur n)
+  (if (< n 3) n
+      (+ (f-recur (- n 1))
+         (* 2 (f-recur (- n 2)))
+         (* 3 (f-recur (- n 3))))))
+
+(assert-eql (f-recur 3) 4)
+(assert-eql (f-recur 4) 11)
+(assert-eql (f-recur 10) 1892)
+
+(define (f-iter n)
+  (define (f-iter-inner a b c counter)
+    (if (= counter 0) c
+        (f-iter-inner (+ a (* 2 b) (* 3 c)) a b (- counter 1))))
+  (f-iter-inner 2 1 0 n))
+
+(assert-eql (f-iter 3) 4)
+(assert-eql (f-iter 4) 11)
+(assert-eql (f-iter 10) 1892)
