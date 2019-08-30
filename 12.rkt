@@ -4,6 +4,12 @@
   (if (not condition)
       (error "Does not match condition")))
 
+(define (factorial n)
+  (if (= n 0) 1
+      (* n (factorial (- n 1)))))
+
+(assert (= (factorial 5) 120))
+
 (define (fib n)
   (define (fib-iter a b c)
     (cond ((= c 0) a)
