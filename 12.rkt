@@ -20,15 +20,16 @@
 (assert-eql (factorial-iter 5) 120)
 
 (define (fib n)
-  (define (fib-iter a b c)
-    (cond ((= c 0) a)
-          (else (fib-iter (+ a b) a (dec c)))))
+  (define (fib-iter a b counter)
+    (if (= counter 0) b
+        (fib-iter (+ a b) a (dec counter))))
   (fib-iter 1 0 n))
 
 (assert-eql (fib 1) 1)
-(assert-eql (fib 2) 2)
-(assert-eql (fib 5) 8)
-(assert-eql (fib 20) 10946)
+(assert-eql (fib 2) 1)
+(assert-eql (fib 5) 5)
+(assert-eql (fib 8) 21)
+(assert-eql (fib 20) 6765)
 
 (define (f-recur n)
   (if (< n 3) n
