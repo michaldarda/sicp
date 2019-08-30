@@ -5,5 +5,7 @@ def fib(n)
     a, b = a + b, a
     n -= 1
   end
-  a
+  b
 end
+
+puts fib(8)
