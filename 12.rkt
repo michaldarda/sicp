@@ -81,3 +81,9 @@
 
 (assert-eql (expt-iter 10 0) 1)
 (assert-eql (expt-iter 5 3) 125)
+
+(define (fast-iter b n)
+  (define (square x) (* x x))
+  (cond ((= n 0) 1)
+        ((even? n) (square (fast-iter b (/ n 2))))
+        (else (* b (fast-iter b (- n 1))))))
