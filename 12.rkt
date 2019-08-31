@@ -170,3 +170,11 @@
                           q
                           (- count 1)))))
   (fib-iter 1 0 0 1 n))
+
+
+;; gcd
+
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
