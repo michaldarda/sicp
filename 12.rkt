@@ -62,3 +62,22 @@
     (else (+
            (pascal-triangle (- row 1) (- col 1))
            (pascal-triangle (- row 1) col)))))
+
+(define (expt b n)
+  (if (= n 0)
+      1
+      (* b (expt b (- n 1)))))
+
+
+(assert-eql (expt 10 0) 1)
+(assert-eql (expt 5 3) 125)
+
+(define (expt-iter b n)
+  (define (expt-iter-inner a counter)
+    (if (= counter 0)
+        a
+        (expt-iter-inner (* a b) (- counter 1))))
+  (expt-iter-inner 1 n))
+
+(assert-eql (expt-iter 10 0) 1)
+(assert-eql (expt-iter 5 3) 125)
