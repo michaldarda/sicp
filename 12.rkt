@@ -118,12 +118,29 @@
 (assert-eql (mul-recur 36 36) 1296)
 
 (define (mul a b)
-  (define (double x) (+ x x))
-  (define (halve x) (/ x 2))
-  (cond [(= b 0) 0]
-        [(even? b) (mul (double a) (halve b))]
-        [else (+ a (mul a (- b 1)))]))
+  (define (mul-inner b accu)
+    (cond [(= b 0) accu]
+          [else (mul-inner (- b 1) (+ accu a))]))
+
+  (mul-inner b 0))
 
 (assert-eql (mul 1 2) 2)
 (assert-eql (mul 2 2) 4)
 (assert-eql (mul 36 36) 1296)
+
+;; 1.18
+
+(define (mul-log-iter a b)
+  (define (double x) (+ x x))
+  (define (halve x) (/ x 2))
+
+  (define (mul-log-inner b accu)
+    (cond [(= b 0) accu]
+          ;; [(even? b) (mul-log-inner (halve b) (double (+ accu a)))]
+          [else (mul-log-inner (- b 1) (+ accu a))]))
+
+  (mul-log-inner b 0))
+
+(assert-eql (mul-log-iter 1 2) 2)
+(assert-eql (mul-log-iter 2 2) 4)
+(assert-eql (mul-log-iter 36 36) 1296)
