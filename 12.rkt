@@ -106,3 +106,24 @@
 (assert-eql (fast-expt-iter 2 2) 4)
 (assert-eql (fast-expt-iter 5 3) 125)
 (assert-eql (fast-expt-iter 5 5) 3125)
+
+;; 1.17
+
+(define (mul-recur a b)
+  (if (= b 0) 0
+      (+ a (mul-recur a (- b 1)))))
+
+(assert-eql (mul-recur 1 2) 2)
+(assert-eql (mul-recur 2 2) 4)
+(assert-eql (mul-recur 36 36) 1296)
+
+(define (mul a b)
+  (define (double x) (+ x x))
+  (define (halve x) (/ x 2))
+  (cond [(= b 0) 0]
+        [(even? b) (mul (double a) (halve b))]
+        [else (+ a (mul a (- b 1)))]))
+
+(assert-eql (mul 1 2) 2)
+(assert-eql (mul 2 2) 4)
+(assert-eql (mul 36 36) 1296)
