@@ -62,9 +62,3 @@
     (else (+
            (pascal-triangle (- row 1) (- col 1))
            (pascal-triangle (- row 1) col)))))
-
-(define (print-pascal-triangle rows)
-  (for ([row (in-range rows)])
-    (for ([col (in-range (+ row 1))])
-      (display (pascal-triangle row col)))
-    (displayln "")))
