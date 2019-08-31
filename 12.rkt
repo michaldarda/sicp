@@ -31,6 +31,7 @@
 (assert-eql (fib 8) 21)
 (assert-eql (fib 20) 6765)
 
+;; 1.11
 (define (f-recur n)
   (if (< n 3) n
       (+ (f-recur (- n 1))
@@ -51,6 +52,7 @@
 (assert-eql (f-iter 4) 11)
 (assert-eql (f-iter 10) 1892)
 
+;; 1.12
 (define (pascal-triangle row col)
   (cond
     ((< row 0) 0)
@@ -91,6 +93,7 @@
 (assert-eql (fast-expt 10 0) 1)
 (assert-eql (fast-expt 5 3) 125)
 
+;; 1.16
 (define (fast-expt-iter b n)
   (define (square x) (* x x))
   (define (fast-expt-inner a b counter)
