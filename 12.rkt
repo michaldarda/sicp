@@ -50,3 +50,21 @@
 (assert-eql (f-iter 3) 4)
 (assert-eql (f-iter 4) 11)
 (assert-eql (f-iter 10) 1892)
+
+(define (pascal-triangle row col)
+  (cond
+    ((< row 0) 0)
+    ((< col 0) 0)
+    ((< row col) 0)
+    ((= row 0) 1)
+    ((= col 0) 1)
+    ((= col row) 1)
+    (else (+
+           (pascal-triangle (- row 1) (- col 1))
+           (pascal-triangle (- row 1) col)))))
+
+(define (print-pascal-triangle rows)
+  (for ([row (in-range rows)])
+    (for ([col (in-range (+ row 1))])
+      (display (pascal-triangle row col)))
+    (displayln "")))
