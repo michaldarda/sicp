@@ -82,8 +82,24 @@
 (assert-eql (expt-iter 10 0) 1)
 (assert-eql (expt-iter 5 3) 125)
 
-(define (fast-iter b n)
+(define (fast-expt b n)
   (define (square x) (* x x))
   (cond ((= n 0) 1)
-        ((even? n) (square (fast-iter b (/ n 2))))
-        (else (* b (fast-iter b (- n 1))))))
+        ((even? n) (square (fast-expt b (/ n 2))))
+        (else (* b (fast-expt b (- n 1))))))
+
+(assert-eql (fast-expt 10 0) 1)
+(assert-eql (fast-expt 5 3) 125)
+
+(define (fast-expt-iter b n)
+  (define (square x) (* x x))
+  (define (fast-expt-inner a b counter)
+    (cond ((= counter 0) a)
+          ((even? counter) (fast-expt-inner a (square b) (/ counter 2)))
+          (else (fast-expt-inner (* a b) b (- counter 1)))))
+  (fast-expt-inner 1 b n))
+
+(assert-eql (fast-expt-iter 10 0) 1)
+(assert-eql (fast-expt-iter 2 2) 4)
+(assert-eql (fast-expt-iter 5 3) 125)
+(assert-eql (fast-expt-iter 5 5) 3125)
