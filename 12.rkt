@@ -180,6 +180,7 @@
       (gcd b (remainder a b))))
 
 ;; Example: Testing for primality
+;; naive way
 
 (define (square x) (* x x))
 
@@ -194,3 +195,80 @@
 
 (define (prime? n)
   (= n (smallest-divisor n)))
+
+;; fermat test
+
+(define (expmod base exp m)
+  (cond [(= exp 0) 1]
+        [(even? exp) (remainder (square (expmod base (/ exp 2) m)) m)]
+        [else (remainder (* base (expmod base (- exp 1) m)) m)]))
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+  (cond [(= times 0) true]
+        [(fermat-test n) (fast-prime? n (- times 1))]
+        [else false]))
+
+;; 1.21
+(assert-eql (smallest-divisor 199) 199)
+(assert-eql (smallest-divisor 1999) 1999)
+(assert-eql (smallest-divisor 19999) 7)
+
+;; 1.22
+
+(define (timed-prime-test n)
+  (start-prime-test n (runtime)))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime n (- (runtime)
+                       start-time))))
+
+(define (report-prime n elapsed-time)
+  (display n)
+  (display " *** ")
+  (display elapsed-time)
+  (newline))
+
+;;
+
+(define (search-for-primes a b)
+  (timed-prime-test a)
+  (if (< a b)
+      (search-for-primes (+ a 1) b)))
+
+;; (search-for-primes 1000 1020)
+;; 1009 *** 4
+;; 1013 *** 4
+;; 1019 *** 4
+
+;; (search-for-primes 10000 10038)
+;; 10007 *** 12
+;; 10009 *** 18
+;; 10037 *** 12
+
+;; (search-for-primes 100000 100050)
+;; 100003 *** 35
+;; 100019 *** 36
+;; 100043 *** 36
+
+
+;; (search-for-primes 1000000 1000050)
+;; 1000003 *** 196
+;; 1000033 *** 197
+;; 1000037 *** 199
+
+;; (sqrt 10)
+;; 3.1622776601683795
+;; 12.rkt> (* 4 (sqrt 10))
+;; 12.649110640673518
+;; 12.rkt> (* 12 (sqrt 10))
+;; 37.94733192202055
+;; 12.rkt> (* 36 (sqrt 10))
+;; 113.84199576606166
+
+;; This indeed confirms that this algorithm has O(sqrt(n)) complexity
