@@ -272,3 +272,88 @@
 ;; 113.84199576606166
 
 ;; This indeed confirms that this algorithm has O(sqrt(n)) complexity
+
+;; 1.23
+
+
+(define (fast-smallest-divisor n) (fast-find-divisor n 2))
+
+(define (fast-find-divisor n test-divisor)
+  (define (next n)
+    (if (= n 2) 3 (+ n 2)))
+
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (fast-find-divisor n (next test-divisor)))))
+
+(define (faster-prime? n)
+  (= n (smallest-divisor n)))
+
+(define (timed-faster-prime-test n)
+  (start-prime-test n (runtime)))
+
+(define (start-faster-prime-test n start-time)
+  (if (faster-prime? n)
+      (report-faster-prime n (- (runtime)
+                         start-time))))
+
+(define (report-faster-prime n elapsed-time)
+  (display n)
+  (display " *** ")
+  (display elapsed-time)
+  (newline))
+
+;; 12.rkt> (timed-faster-prime-test 1009)
+;; 1009 *** 14
+;; 12.rkt> (timed-faster-prime-test 1013)
+;; 1013 *** 11
+;; 12.rkt> (timed-faster-prime-test 1019)
+;; 1019 *** 11
+
+;; 12.rkt> (timed-faster-prime-test 10007)
+;; 10007 *** 20
+;; 12.rkt> (timed-faster-prime-test 10009)
+;; 10009 *** 22
+;; 12.rkt> (timed-faster-prime-test 10037)
+;; 10037 *** 19
+
+;; 12.rkt> (timed-faster-prime-test 100003)
+;; 100003 *** 50
+;; 12.rkt> (timed-faster-prime-test 100019)
+;; 100019 *** 43
+;; 12.rkt> (timed-faster-prime-test 100043)
+;; 100043 *** 43
+
+;; 12.rkt> (timed-faster-prime-test 1000003)
+;; 1000003 *** 138
+;; 12.rkt> (timed-faster-prime-test 1000033)
+;; 1000033 *** 137
+;; 12.rkt> (timed-faster-prime-test 1000037)
+;; 1000037 *** 137
+
+;; Its faster for bigger inputs but for smaller ones seems even slower??
+
+;; 1.24
+
+(define (timed-fast-prime-test n)
+  (start-fast-prime-test n (runtime)))
+
+(define (start-fast-prime-test n start-time)
+  (if (fast-prime? n 100)
+      (report-faster-prime n (- (runtime)
+                                start-time))))
+
+(define (report-fast-prime n elapsed-time)
+  (display n)
+  (display " *** ")
+  (display elapsed-time)
+  (newline))
+
+;; ex 1.25
+
+;; probably yes, havent tested though
+
+;; ex 1.26
+
+;; this is wrong, if you use square it only computes expmod once,
+;; somehow caches it, otherwise it evaluates expmod twice
