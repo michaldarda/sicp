@@ -1,4 +1,4 @@
-#lang sicp
+#lang racket
 
 (define (cube x) (* x x x))
 
@@ -17,5 +17,6 @@
   (* (/ h 3) (+ (f a) (loop n (f b) b))))
 
 
-(simpson cube 0 1 10)
-(simpson cube 0 1 100)
+(simpson cube 0 1 10.0)
+(simpson cube 0 1 100.0)
+(simpson cube 0 1 1000.0)
