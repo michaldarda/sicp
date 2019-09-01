@@ -22,7 +22,7 @@
   (start-prime-test n (runtime)))
 
 (define (start-prime-test n start-time)
-  (if (fast-prime? n 100)
+  (if (fast-prime? n 5)
       (report-prime n (- (runtime)
                                 start-time))
       0))
