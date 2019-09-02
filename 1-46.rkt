@@ -30,9 +30,6 @@
   (define (close-enough? guess)
     (< (abs (- guess (f guess)))
        tolerance))
-  ((iterative-improve
-    close-enough?
-    (lambda (guess) (f guess)))
-   first-guess))
+  ((iterative-improve close-enough? f) first-guess))
 
 (fixed-point cos 1.0)
