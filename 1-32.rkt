@@ -30,3 +30,11 @@
   (product-recur identity 1 inc n))
 
 (assert-eql (factorial-recur 5) 120)
+
+(define (pi-approx n)
+  (define (term n)
+    (cond [(even? n) (/ (+ n 2) (+ n 1))]
+          [else (/ (+ n 1) (+ n 2))]))
+  (* 4.0 (product term 1 inc n)))
+
+(pi-approx 10000)
