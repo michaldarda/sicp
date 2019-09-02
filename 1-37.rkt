@@ -13,9 +13,9 @@
 (define (cont-frac-iter n d k)
   (define (loop i accu)
     (if (= i 0)
-        (/ (n i) (+ (d i) accu))
+        accu
         (loop (- i 1) (/ (n i) (+ (d i) accu)))))
-  (loop k 0))
+  (loop k (/ (n k) (d k))))
 
 (cont-frac-iter (lambda (i) 1.0)
                 (lambda (i) 1.0)
