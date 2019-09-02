@@ -1,17 +1,22 @@
 #lang racket
 
 (define (cont-frac n d k)
-  (define (cont-frac-inner counter)
-    (if (= counter k) (/ (n counter) (d counter))
-        (/ (n counter) (+ (d counter) (cont-frac-inner (+ counter 1))))))
+  (define (cont-frac-inner i)
+    (if (= i k) (/ (n i) (d i))
+        (/ (n i) (+ (d i) (cont-frac-inner (+ i 1))))))
   (cont-frac-inner 0))
 
 (cont-frac (lambda (i) 1.0)
            (lambda (i) 1.0)
            10)
 
-(define (fib n)
-  (define (fib-iter a b counter)
-    (if (= counter 0) b
-        (fib-iter (+ a b) a (dec counter))))
-  (fib-iter 1 0 n))
+(define (cont-frac-iter n d k)
+  (define (loop i accu)
+    (if (= i 0)
+        (/ (n i) (+ (d i) accu))
+        (loop (- i 1) (/ (n i) (+ (d i) accu)))))
+  (loop k 0))
+
+(cont-frac-iter (lambda (i) 1.0)
+                (lambda (i) 1.0)
+                10)
