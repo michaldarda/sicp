@@ -6,35 +6,33 @@
              expected " actual: " actual)
       true))
 
-(define (inc n) (+ n 1))
+(define (inc x) (+ 1 x))
 
-(define (product term a next b)
+(define (accumulate combiner null-value term a next b)
   (define (iter a result)
     (if (> a b)
         result
-        (iter (next a) (* result (term a)))))
-  (iter a 1))
+        (iter (next a) (combiner result (term a)))))
+  (iter a null-value))
 
-(define (factorial n)
-  (product identity 1 inc n))
+(define (sum term a next b)
+  (accumulate + 1 term a next b))
 
-(assert-eql (factorial 5) 120)
+(define (product term a next b)
+  (accumulate * 1 term a next b))
+
+(assert-eql (product identity 1 inc 5) 120)
+
+(define (accumulate-recur combiner null-value term a next b)
+  (if (> a b)
+      null-value
+      (* (term a)
+         (accumulate-recur combiner null-value term (next a) next b))))
+
+(define (sum-recur term a next b)
+  (accumulate-recur + 1 term a next b))
 
 (define (product-recur term a next b)
-  (if (> a b)
-      1
-      (* (term a)
-         (product-recur term (next a) next b))))
+  (accumulate-recur * 1 term a next b))
 
-(define (factorial-recur n)
-  (product-recur identity 1 inc n))
-
-(assert-eql (factorial-recur 5) 120)
-
-(define (pi-approx n)
-  (define (term n)
-    (cond [(even? n) (/ (+ n 2) (+ n 1))]
-          [else (/ (+ n 1) (+ n 2))]))
-  (* 4.0 (product term 1 inc n)))
-
-(pi-approx 10000)
+(assert-eql (product-recur identity 1 inc 5) 120)
