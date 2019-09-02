@@ -37,3 +37,14 @@
 
 (define (sum-of-prime-squares a b)
   (filtered-accumulate + 0 square a inc b prime?))
+
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+
+(define (product-of-all-positive-integers-relatively-prime-to n)
+  (define (relatively-prime? i)
+    (= (gcd i n) 1))
+
+  (filtered-accumulate * 1 identity 1 inc n relatively-prime?))
