@@ -11,3 +11,13 @@
     [else (cons (square-tree (car t)) (square-tree (cdr t)))]))
 
 (square-tree tree)
+
+(define (square x) (* x x))
+
+(define (square-tree-map t)
+  (cond
+    [(null? t) null]
+    [else (append (map square (list (car t)))
+                  (square-tree (cdr t)))]))
+
+(square-tree-map tree)
