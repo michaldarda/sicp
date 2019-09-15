@@ -1,5 +1,7 @@
 #lang racket
 
+(define (square x) (* x x))
+
 (define tree (list 1
                    (list 2 (list 3 4) 5)
                    (list 6 7)))
@@ -12,12 +14,11 @@
 
 (square-tree tree)
 
-(define (square x) (* x x))
+(define (square-tree-2 xs)
+  (map (lambda (x)
+         (cond [(list? x) (square-tree-2 x)]
+               [else (square x)]))
+       xs
+       ))
 
-(define (square-tree-map t)
-  (cond
-    [(null? t) null]
-    [else (append (map square (list (car t)))
-                  (square-tree (cdr t)))]))
-
-(square-tree-map tree)
+(square-tree-2 tree)
