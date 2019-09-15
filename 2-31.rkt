@@ -11,8 +11,7 @@
   (map (lambda (x)
          (cond [(list? x) (tree-map f x)]
                [else (f x)]))
-       xs
-       ))
+       xs))
 
 (define (square-tree tree) (tree-map square tree))
 (square-tree tree)
