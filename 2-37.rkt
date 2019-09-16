@@ -23,13 +23,18 @@
   (accumulate + 0 (map * v w)))
 
 (define (matrix-*-vector m v)
-  (map ?? m))
+  (map (lambda (r) (accumulate + 0 (map * r v))) m))
+
+(matrix-*-vector (list (list 1 2 3)
+                       (list 4 5 6)
+                       (list 7 8 9))
+                 (list 2 1 3))
 
 (define (transpose m)
   (accumulate-n cons '() m))
 
+(transpose m)
+
 (define (matrix-*-matrix m n)
   (let ([cols (transpose n)])
     (map ?? m)))
-
-(transpose m)
