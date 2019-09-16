@@ -37,4 +37,14 @@
 
 (define (matrix-*-matrix m n)
   (let ([cols (transpose n)])
-    (map ?? m)))
+    (map (lambda (r) (matrix-*-vector cols r)) m)))
+
+(matrix-*-matrix (list (list 0 1)
+                       (list 0 0))
+                 (list (list 0 0)
+                       (list 1 0)))
+
+(matrix-*-matrix (list (list 1 2)
+                       (list 3 4))
+                 (list (list 2 0)
+                       (list 1 2)))
