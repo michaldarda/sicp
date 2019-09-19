@@ -16,9 +16,10 @@
 
 ;;
 
-(define (empty-board) (list (list)))
-(define (safe? k positions) #t)
-(define (adjoin-position new-row k rest-of-queens) rest-of-queens)
+(define empty-board null)
+(define (safe? k positions) #f)
+(define (adjoin-position new-row k rest-of-queens)
+  (append rest-of-queens (list (cons new-row k))))
 
 (define (queens board-size)
   (define (queen-cols k)
@@ -34,3 +35,5 @@
                  (enumerate-interval 1 board-size)))
           (queen-cols (- k 1))))))
   (queen-cols board-size))
+
+(queens 10)
