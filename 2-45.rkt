@@ -1,17 +1,16 @@
 #lang sicp
 (#%require sicp-pict)
 
-(define (up-split painter n)
-  (if (= n 0)
-      painter
-      (let ((smaller (up-split painter (- n 1))))
-        (below painter (beside smaller smaller)))))
+(define (split f1 f2)
+  (define (proc painter n)
+    (if (= n 0)
+        painter
+        (let ((smaller (proc painter (- n 1))))
+          (f2 painter (f1 smaller smaller)))))
+  proc)
 
-(define (right-split painter n)
-  (if (= n 0)
-      painter
-      (let ((smaller (right-split painter (- n 1))))
-        (beside painter (below smaller smaller)))))
+(define right-split (split beside below))
+(define up-split (split below beside))
 
 (define (corner-split painter n)
   (if (= n 0)
