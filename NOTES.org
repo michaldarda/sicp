@@ -5,3 +5,4 @@ Notes mostly to myself to go back to some exercises and do something.
 ** TODO 2-49 add a wave definition
 ** TODO 2-51 add a second beside def based on transformations
 ** TODO 2-52 complete
+** TODO 2-58-b
