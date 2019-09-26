@@ -64,3 +64,6 @@
 
 (define t (list->tree (list 1 2 3 4 5 6 7 8 9)))
 (tree->list t)
+
+;; the perfect balanced tree is when left and right subtree has
+;; n/2 elements thats why (n / 2)
