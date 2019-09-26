@@ -24,6 +24,7 @@
 (define (adjoin-set x set)
   (define (loop set accu)
     (cond [(empty? set) (append accu (list x))]
+          [(= x (car set)) set]
           [(< x (car set))
            (append accu (list x) set)]
           [else (loop (cdr set) (append accu (list (car set))))]))
