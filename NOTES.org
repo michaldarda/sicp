@@ -7,3 +7,5 @@ Notes mostly to myself to go back to some exercises and do something.
 ** TODO 2-52 complete
 ** 2-58-b
 ** TODO 2-64 add a comment how partial tree procedure works
+** TODO 2-73 and corresponding check why ** x y 'x dont work
+** TODO 2-74
