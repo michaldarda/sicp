@@ -12,14 +12,14 @@
   (cons type-tag contents))
 
 (define (type-tag datum)
-  (if (pair? datum)
-      (car datum)
-      (error "Bad tagged datum -- TYPE-TAG" datum)))
+  (cond [(number? datum) 'scheme-number]
+        [(pair? datum) (car datum)]
+        [else (error "Bad tagged datum -- TYPE-TAG" datum)]))
 
 (define (contents datum)
-  (if (pair? datum)
-      (cdr datum)
-      (error "Bad tagged datum -- CONTENTS" datum)))
+  (cond [(number? datum) datum]
+        [(pair? datum) (cdr datum)]
+        [else (error "Bad tagged datum -- CONTENTS" datum)]))
 
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
@@ -33,16 +33,10 @@
 (define (install-scheme-number-package)
   (define (tag x)
     (attach-tag 'scheme-number x))
-  (put 'add '(scheme-number scheme-number)
-       (lambda (x y) (tag (+ x y))))
-  (put 'sub '(scheme-number scheme-number)
-       (lambda (x y) (tag (- x y))))
-  (put 'mul '(scheme-number scheme-number)
-       (lambda (x y) (tag (* x y))))
-  (put 'div '(scheme-number scheme-number)
-       (lambda (x y) (tag (/ x y))))
-  (put 'make 'scheme-number
-       (lambda (x) (tag x)))
+  (put 'add '(scheme-number scheme-number) +)
+  (put 'sub '(scheme-number scheme-number) -)
+  (put 'mul '(scheme-number scheme-number) *)
+  (put 'div '(scheme-number scheme-number) /)
   'done)
 
 (install-scheme-number-package)
