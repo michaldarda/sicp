@@ -33,30 +33,47 @@
         [(pair? datum) (cdr datum)]
         [else (error "Bad tagged datum -- CONTENTS" datum)]))
 
+;; it returns right coerction for args for example given
+;; '(complex scheme-number)
+;; it returns list of procedures (lambdas)
+;; '(identity scheme-number->complex)
+;; then this list of procedures
+
+;; this function could be private for apply-generic
+;; I make it public to be easily testable
+(define (find-right-coercion args)
+  (let ([coerce-combinations
+         ;; looking for pairs arg2->arg1
+         (map (lambda (arg1)
+                (map (lambda (arg2)
+                       (cond [(eq? arg1 arg2) identity]
+                             [(get-coercion arg2 arg1) (get-coercion arg2 arg1)]
+                             [else #f])) args)) args)])
+    (car (filter (lambda (combination)
+                   (andmap (lambda (e) (not (eq? e #f))) combination))
+                 coerce-combinations))))
+
+
 (define (apply-generic op . args)
   (let ([type-tags (map type-tag args)])
     (let ([proc (get op type-tags)])
       (if proc
           (apply proc (map contents args))
-          (if (= (length args) 2)
-              (let ([type1 (car type-tags)]
-                    [type2 (cadr type-tags)]
-                    [a1 (car args)]
-                    [a2 (cadr args)])
-                (if (not (eq? type1 type2))
-                    (let ([t1->t2 (get-coercion type1 type2)]
-                          [t2->t1 (get-coercion type2 type1)])
-                      (cond (t1->t2
-                             (apply-generic op (t1->t2 a1) a2))
-                            (t2->t1
-                             (apply-generic op a1 (t2->t1 a2)))
-                            (else (error "No method for these types"
-                                         (list op type-tags)))))
+          (let ([coercions (find-right-coercion type-tags)])
+            (if coercions
+                (apply apply-generic (cons op
+                                           ;; here we are transforming args according to coercions
+                                           ;; it takes to arrays coercions and args like that
 
-                    (error "No method for these types and types are the same"
-                           (list op type-tags))))
-              (error "No method for these types"
-                     (list op type-tags)))))))
+                                           ;; coercions '(identity scheme-number->complex)
+                                           ;; args (make-complex-from-real-imag 1 2) 1)
+
+                                           ;; it will leave first argument as it is (identity fn)
+                                           ;; and it would transform scheme-number to complex according
+                                           ;; to the scheme-number->complex procedure
+                                           (map (lambda (f x) (f x)) coercions args)))
+                (error "No method for these types"
+                       (list op type-tags))))))))
 
 (define (real-part z) (apply-generic 'real-part z))
 (define (imag-part z) (apply-generic 'imag-part z))
@@ -190,6 +207,11 @@
   (define (make-from-mag-ang r a)
     ((get 'make-from-mag-ang 'polar) r a))
   ;; internal procedures
+  (define (add-many-complex . args)
+    (let ([real-parts (map real-part args)]
+          [imag-parts (map imag-part args)])
+      (make-from-real-imag (apply + real-parts)
+                           (apply + imag-parts))))
   (define (add-complex z1 z2)
     (make-from-real-imag (+ (real-part z1) (real-part z2))
                          (+ (imag-part z1) (imag-part z2))))
@@ -211,6 +233,11 @@
   (define (tag z) (attach-tag 'complex z))
   (put 'add '(complex complex)
        (lambda (z1 z2) (tag (add-complex z1 z2))))
+  ;; its a separate procedure cause it would be hard
+  ;; to make general procedure that adds arbitrary num
+  ;; of arguments due to its type signature
+  (put 'add-three '(complex complex complex)
+       (lambda (z1 z2 z3) (tag (add-many-complex z1 z2 z3))))
   (put 'sub '(complex complex)
        (lambda (z1 z2) (tag (sub-complex z1 z2))))
   (put 'mul '(complex complex)
@@ -230,6 +257,7 @@
 (install-complex-package)
 
 (define (add x y) (apply-generic 'add x y))
+(define (add-three x y z) (apply-generic 'add-three x y z))
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))
@@ -253,16 +281,7 @@
 (define (complex->scheme-number z)
   (real-part z))
 
-;; (exp (make-complex-from-real-imag 1 2) (make-complex-from-mag-ang 1 2))
-
-(define (find-right-coercion args)
-  (let ([coerce-combinations
-         ;; looking for pairs arg2->arg1
-         (map (lambda (arg1)
-                (map (lambda (arg2)
-                       (cond [(eq? arg1 arg2) (lambda () (arg2))]
-                             [(get-coercion arg2 arg1) (get-coercion arg2 arg1)]
-                             [else #f])) args)) args)])
-        (car (filter (lambda (combination) (andmap (lambda (e) (not (eq? e #f))) combination)) coerce-combinations))))
-
 (find-right-coercion '(complex scheme-number complex))
+
+(add 1 2)
+(add-three (make-complex-from-real-imag 1 2) 1 (make-complex-from-real-imag 3 3))

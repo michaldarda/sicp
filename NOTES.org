@@ -12,3 +12,5 @@ Notes mostly to myself to go back to some exercises and do something.
 ** TODO 2-81 I don't get it, ppl say that invoking exp for 2 complex numbers will result
 in infinite loop where in my implementation it correctly reports that no such procedure
 is found for this types.
+
+** TODO 2-82 Find a case when find-right-coercion procedure fails is not working
