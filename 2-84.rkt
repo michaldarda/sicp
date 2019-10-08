@@ -63,7 +63,10 @@
            [minimum-hierarchy (apply min hierarchies-length)])
     (map
      (lambda (arg hierarchy-length)
-       (repeated raise (- hierarchy-length minimum-hierarchy)) arg)
+       (let ([n (- hierarchy-length minimum-hierarchy 1)])
+         (if (< n 0)
+             arg
+             ((repeated raise n) arg))))
      args
      hierarchies-length)))
 
@@ -332,3 +335,5 @@
 (hierarchy 'scheme-number)
 (hierarchy 'complex)
 (find-right-coercion (list 1 (raise 1) (raise (raise 1))))
+
+(add 1 (raise 1))
