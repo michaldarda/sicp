@@ -34,16 +34,6 @@
         [else (error "Bad tagged datum -- CONTENTS" datum)]))
 
 (define (apply-generic op . args)
-  (define (find-right-coercion)
-    (let ([coerce-combinations
-           ;; looking for pairs arg2->arg1
-           (map (lambda (arg1)
-                  (map (arg2)
-                       (cond [(eq? (arg1 arg2)) (lambda () (arg2))]
-                             [(get-coercion arg2 arg1) (lambda () ((get-coercion arg2 arg1) arg2))]
-                             [else #f]))) args)])
-      (filter (lambda (combination)))
-
   (let ([type-tags (map type-tag args)])
     (let ([proc (get op type-tags)])
       (if proc
@@ -258,7 +248,21 @@
 (define (scheme-number->complex n)
   (make-complex-from-real-imag (contents n) 0))
 
+(put-coercion 'scheme-number 'complex scheme-number->complex)
+
 (define (complex->scheme-number z)
   (real-part z))
 
-(exp (make-complex-from-real-imag 1 2) (make-complex-from-mag-ang 1 2))
+;; (exp (make-complex-from-real-imag 1 2) (make-complex-from-mag-ang 1 2))
+
+(define (find-right-coercion args)
+  (let ([coerce-combinations
+         ;; looking for pairs arg2->arg1
+         (map (lambda (arg1)
+                (map (lambda (arg2)
+                       (cond [(eq? arg1 arg2) (lambda () (arg2))]
+                             [(get-coercion arg2 arg1) (get-coercion arg2 arg1)]
+                             [else #f])) args)) args)])
+        (car (filter (lambda (combination) (andmap (lambda (e) (not (eq? e #f))) combination)) coerce-combinations))))
+
+(find-right-coercion '(complex scheme-number complex))
