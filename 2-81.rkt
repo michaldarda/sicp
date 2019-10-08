@@ -43,14 +43,18 @@
                     [type2 (cadr type-tags)]
                     [a1 (car args)]
                     [a2 (cadr args)])
-                (let ([t1->t2 (get-coercion type1 type2)]
-                      [t2->t1 (get-coercion type2 type1)])
-                  (cond (t1->t2
-                         (apply-generic op (t1->t2 a1) a2))
-                        (t2->t1
-                         (apply-generic op a1 (t2->t1 a2)))
-                        (else (error "No method for these types"
-                                     (list op type-tags))))))
+                (if (not (eq? type1 type2))
+                    (let ([t1->t2 (get-coercion type1 type2)]
+                          [t2->t1 (get-coercion type2 type1)])
+                      (cond (t1->t2
+                             (apply-generic op (t1->t2 a1) a2))
+                            (t2->t1
+                             (apply-generic op a1 (t2->t1 a2)))
+                            (else (error "No method for these types"
+                                         (list op type-tags)))))
+
+                    (error "No method for these types and types are the same"
+                           (list op type-tags))))
               (error "No method for these types"
                      (list op type-tags)))))))
 
@@ -62,12 +66,22 @@
 (define (install-scheme-number-package)
   (define (tag x)
     (attach-tag 'scheme-number x))
-  (put 'add '(scheme-number scheme-number) +)
-  (put 'sub '(scheme-number scheme-number) -)
-  (put 'mul '(scheme-number scheme-number) *)
-  (put 'div '(scheme-number scheme-number) /)
-  (put 'equ? '(scheme-number scheme-number) =)
-  (put '=zero? '(scheme-number) zero?)
+  (put 'add '(scheme-number scheme-number)
+       (lambda (x y) (tag (+ x y))))
+  (put 'sub '(scheme-number scheme-number)
+       (lambda (x y) (tag (- x y))))
+  (put 'mul '(scheme-number scheme-number)
+       (lambda (x y) (tag (* x y))))
+  (put 'div '(scheme-number scheme-number)
+       (lambda (x y) (tag (/ x y))))
+  (put 'exp '(scheme-number scheme-number)
+       (lambda (x y) (tag (expt x y))))
+  (put 'equ? '(scheme-number scheme-number)
+       (lambda (x y) (= x y)))
+  (put 'zero? '(scheme-number)
+       (lambda (x) (= x 0)))
+  (put 'make 'scheme-number
+       (lambda (x) (tag x)))
   'done)
 
 (define (install-rational-package)
@@ -219,18 +233,25 @@
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))
+(define (equ? x y) (apply-generic 'equ? x y))
+(define (=zero? x) (apply-generic '=zero? x))
+(define (exp x y) (apply-generic 'exp x y))
 
 (define (make-complex-from-real-imag x y)
   ((get 'make-from-real-imag 'complex) x y))
 (define (make-complex-from-mag-ang r a)
   ((get 'make-from-mag-ang 'complex) r a))
 
-(define (equ? x y)
-  (apply-generic 'equ? x y))
+(define (scheme-number->scheme-number n) n)
+(define (complex->complex z) z)
 
-(define (=zero? x) (apply-generic '=zero? x))
+(define (scheme-number->complex n)
+  (make-complex-from-real-imag (contents n) 0))
 
-(=zero? 0)
-(=zero? (make-rational 0 2))
-(=zero? (make-complex-from-real-imag 0 0))
-(=zero? (make-complex-from-real-imag 0 1))
+(define (complex->scheme-number z)
+  (real-part z))
+
+(put-coercion 'scheme-number 'scheme-number scheme-number->scheme-number)
+(put-coercion 'complex 'complex complex->complex)
+
+(exp (make-complex-from-real-imag 1 2) (make-complex-from-mag-ang 1 2))
