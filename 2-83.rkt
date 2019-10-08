@@ -6,11 +6,19 @@
 
 (define (put op type proc)
   (hash-set! *op-table* (list op type) proc))
+
 (define (get op type)
   (hash-ref *op-table* (list op type) #f))
 
+(define (put-coercion source-type target-type proc)
+  (put 'coercion (list source-type target-type) proc))
+
+(define (get-coercion source-type target-type)
+  (get 'coercion (list source-type target-type)))
+
+
 (define (put-super type super-type)
-  (put 'super type super-type)))
+  (put 'super type super-type))
 
 (define (get-super type)
   (get 'super type))
@@ -126,6 +134,12 @@
          (= (denom x) (denom y))))
   (define (=zero? x)
     (= (numer x) 0))
+  ;; it does not coerce to any type, just makes
+  ;; the division
+  (define (to-real x)
+    (let ([numer (numer x)]
+          [denom (denom x)])
+      (/ (* numer 1.0) denom)))
   ;; interface to rest of the system
   (define (tag x) (attach-tag 'rational x))
   (put 'add '(rational rational)
@@ -138,6 +152,7 @@
        (lambda (x y) (tag (div-rat x y))))
   (put 'equ? '(rational rational) equ?)
   (put '=zero? '(rational) =zero?)
+  (put 'to-real 'rational to-real)
   (put 'make 'rational
        (lambda (n d) (tag (make-rat n d))))
   'done)
@@ -235,8 +250,6 @@
   ;; its a separate procedure cause it would be hard
   ;; to make general procedure that adds arbitrary num
   ;; of arguments due to its type signature
-  (put 'add-three '(complex complex complex)
-       (lambda (z1 z2 z3) (tag (add-many-complex z1 z2 z3))))
   (put 'sub '(complex complex)
        (lambda (z1 z2) (tag (sub-complex z1 z2))))
   (put 'mul '(complex complex)
@@ -256,7 +269,6 @@
 (install-complex-package)
 
 (define (add x y) (apply-generic 'add x y))
-(define (add-three x y z) (apply-generic 'add-three x y z))
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))
@@ -266,18 +278,46 @@
 
 (define (make-complex-from-real-imag x y)
   ((get 'make-from-real-imag 'complex) x y))
+
 (define (make-complex-from-mag-ang r a)
   ((get 'make-from-mag-ang 'complex) r a))
 
-(define (scheme-number->scheme-number n) n)
-(define (complex->complex z) z)
-
+;; coercions could also go to the raise package
 (define (scheme-number->complex n)
   (make-complex-from-real-imag (contents n) 0))
 
 (put-coercion 'scheme-number 'complex scheme-number->complex)
 
-(define (complex->scheme-number z)
-  (real-part z))
+(define (scheme-number->rational n)
+  (make-rational (contents n) 1))
 
-(define )
+(put-coercion 'scheme-number 'rational scheme-number->rational)
+
+(define (rational->complex rat)
+  (make-complex-from-real-imag ((get 'to-real 'rational) (contents rat)) 0))
+
+(put-coercion 'rational 'complex rational->complex)
+
+(define (install-raise-package)
+  (define (raise val)
+    (letrec ([type (type-tag val)]
+             [super-type (get 'super type)]
+             [coercion (get-coercion type super-type)])
+      (if (null? super-type)
+          null
+          (if coercion
+              (coercion val)
+              (error "No way to convert" type "into" super-type)))))
+
+  (put 'super 'scheme-number 'rational)
+  (put 'super 'rational 'complex)
+  (put 'super 'complex null)
+  (put 'raise 'raise raise)
+  'done)
+
+(install-raise-package)
+
+(define (raise x) ((get 'raise 'raise) x))
+(raise 1)
+(raise (raise 1))
+(raise (raise (raise 1)))
