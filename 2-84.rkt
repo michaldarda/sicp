@@ -8,9 +8,9 @@
 (define (repeated f n)
   (define (loop accu n)
     (if (= n 0) accu
-        (loop (compose f f) (- n 1))))
+        (loop (compose accu f) (- n 1))))
 
-  (loop f n))
+  (loop identity n))
 
 (define *op-table* (make-weak-hash))
 
@@ -25,7 +25,6 @@
 
 (define (get-coercion source-type target-type)
   (get 'coercion (list source-type target-type)))
-
 
 (define (put-super type super-type)
   (put 'super type super-type))
@@ -50,23 +49,19 @@
         [(pair? datum) (cdr datum)]
         [else (error "Bad tagged datum -- CONTENTS" datum)]))
 
-;; it returns right coerction for args for example given
-;; '(complex integer)
-;; it returns list of procedures (lambdas)
-;; '(identity integer->complex)
-;; then this list of procedures
-
-;; this function could be private for apply-generic
-;; I make it public to be easily testable
 (define (coerce args)
   (letrec ([hierarchies-length
             (map (lambda (a) (length (hierarchy a))) (map type-tag args))]
            [min-hierarchy (apply min hierarchies-length)])
     (map
      (lambda (arg hierarchy-length)
-       (let ([n (- hierarchy-length min-hierarchy 1)])
+       (let ([n (- hierarchy-length min-hierarchy)])
          (if (< n 0)
              arg
+             ;; raise that many times to match
+             ;; item which hierachy is minimal
+             ;; in other words which types
+             ;; hierarchy to the top is the shortest
              ((repeated raise n) arg))))
      args
      hierarchies-length)))
@@ -106,6 +101,27 @@
        (lambda (x) (= x 0)))
   (put 'make 'integer
        (lambda (x) (tag x)))
+  'done)
+
+(define (install-real-package)
+  (define (tag x)
+    (attach-tag 'real x))
+  (put 'add '(real real)
+       (lambda (x y) (tag (+ x y))))
+  (put 'sub '(real real)
+       (lambda (x y) (tag (- x y))))
+  (put 'mul '(real real)
+       (lambda (x y) (tag (* x y))))
+  (put 'div '(real real)
+       (lambda (x y) (tag (/ x y))))
+  (put 'exp '(real real)
+       (lambda (x y) (tag (expt x y))))
+  (put 'equ? '(real real)
+       (lambda (x y) (= x y)))
+  (put 'zero? '(real)
+       (lambda (x) (= x 0)))
+  (put 'make 'real
+       (lambda (x) (tag (* x 1.0))))
   'done)
 
 (define (install-rational-package)
@@ -265,6 +281,7 @@
   'done)
 
 (install-integer-package)
+(install-real-package)
 (install-rational-package)
 (install-complex-package)
 
@@ -275,6 +292,9 @@
 (define (equ? x y) (apply-generic 'equ? x y))
 (define (=zero? x) (apply-generic '=zero? x))
 (define (exp x y) (apply-generic 'exp x y))
+
+(define (make-real x)
+  ((get 'make 'real) x))
 
 (define (make-complex-from-real-imag x y)
   ((get 'make-from-real-imag 'complex) x y))
@@ -288,10 +308,15 @@
 
 (put-coercion 'integer 'complex integer->complex)
 
-(define (integer->rational n)
+(define (integer->real n)
+  (make-real (contents n)))
+
+(put-coercion 'integer 'real integer->real)
+
+(define (real->rational n)
   (make-rational (contents n) 1))
 
-(put-coercion 'integer 'rational integer->rational)
+(put-coercion 'real 'rational real->rational)
 
 (define (rational->complex rat)
   (make-complex-from-real-imag ((get 'to-real 'rational) (contents rat)) 0))
@@ -316,9 +341,10 @@
             acc
             (loop super-type (append acc (list super-type))))))
 
-    (loop base (list base)))
+    (loop base null))
 
-  (put 'super 'integer 'rational)
+  (put 'super 'integer 'real)
+  (put 'super 'real 'rational)
   (put 'super 'rational 'complex)
   (put 'super 'complex null)
   (put 'raise 'hierarchy hierarchy)
@@ -335,6 +361,6 @@
 
 (hierarchy 'integer)
 (hierarchy 'complex)
-(coerce (list 1 (raise 1) (raise (raise 1))))
+(coerce (list 1 (raise 1) (raise (raise (raise 1)))))
 
 (add 1 (raise 1))
