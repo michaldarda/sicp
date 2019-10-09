@@ -1,4 +1,5 @@
 #lang racket
+(require threading)
 
 (define (square x) (* x x))
 
@@ -282,6 +283,10 @@
   (put '=zero? '(complex) =zero?)
   (put 'make-from-mag-ang 'complex
        (lambda (r a) (tag (make-from-mag-ang r a))))
+  (put 'real-part '(complex) real-part)
+  (put 'imag-part '(complex) imag-part)
+  (put 'magnitude '(complex) magnitude)
+  (put 'angle '(complex) angle)
   'done)
 
 (install-integer-package)
@@ -326,10 +331,9 @@
 ;; way to push types down in the tower
 
 (define (complex->rational z)
-  (define (real-part x) ((get 'real-part 'complex) x))
   (make-rational (real-part z) 1))
 
-(put-coercion 'complex 'rational rational->complex)
+(put-coercion 'complex 'rational complex->rational)
 
 (define (rational->real n)
   (make-real ((get 'to-real 'rational) (contents n))))
@@ -362,6 +366,15 @@
               (coercion val)
               (error "No way to convert" type "into" subtype)))))
 
+  (define (drop val)
+    (let ([subtype (get-subtype (type-tag val))])
+      (if (not subtype)
+          val
+          (let ([vall (project val)])
+            (if (equ? val (raise vall))
+                (drop vall)
+                val)))))
+
   (define (hierarchy base)
     (define (loop base acc)
       (let ([super-type (get 'super base)])
@@ -378,6 +391,7 @@
   (put 'raise 'hierarchy hierarchy)
   (put 'raise 'raise raise)
   (put 'raise 'project project)
+  (put 'raise 'drop drop)
   'done)
 
 (install-raise-package)
@@ -385,14 +399,19 @@
 (define (raise x) ((get 'raise 'raise) x))
 (define (project x) ((get 'raise 'project) x))
 (define (hierarchy base) ((get 'raise 'hierarchy) base))
-(raise 1)
-(raise (raise 1))
-(raise (raise (raise 1)))
+(define (drop x) ((get 'raise 'drop) x))
 
-(hierarchy 'integer)
-(hierarchy 'complex)
-(coerce (list 1 (raise 1) (raise (raise (raise 1)))))
+;; (~> (make-complex-from-mag-ang 1 0)
+;;     complex->rational
+;;     rational->real
+;;     real->integer)
 
-(add 1 (raise 1))
+;; (define z1 (make-complex-from-mag-ang 1 0))
+;; (define z2 (~> z1
+;;                project
+;;                raise))
 
-(get-subtype (make-real 1))
+;; (equ? z1 z2)
+
+(~> (make-complex-from-mag-ang 1 0)
+    drop)
