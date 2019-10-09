@@ -36,12 +36,12 @@
 ;;
 
 (define (attach-tag type-tag contents)
-  (if (eq? type-tag 'scheme-number)
+  (if (eq? type-tag 'integer)
       contents
       (cons type-tag contents)))
 
 (define (type-tag datum)
-  (cond [(number? datum) 'scheme-number]
+  (cond [(number? datum) 'integer]
         [(pair? datum) (car datum)]
         [else (error "Bad tagged datum -- TYPE-TAG" datum)]))
 
@@ -51,19 +51,20 @@
         [else (error "Bad tagged datum -- CONTENTS" datum)]))
 
 ;; it returns right coerction for args for example given
-;; '(complex scheme-number)
+;; '(complex integer)
 ;; it returns list of procedures (lambdas)
-;; '(identity scheme-number->complex)
+;; '(identity integer->complex)
 ;; then this list of procedures
 
 ;; this function could be private for apply-generic
 ;; I make it public to be easily testable
-(define (find-right-coercion args)
-  (letrec ([hierarchies-length (map (lambda (a) (length (hierarchy a))) (map type-tag args))]
-           [minimum-hierarchy (apply min hierarchies-length)])
+(define (coerce args)
+  (letrec ([hierarchies-length
+            (map (lambda (a) (length (hierarchy a))) (map type-tag args))]
+           [min-hierarchy (apply min hierarchies-length)])
     (map
      (lambda (arg hierarchy-length)
-       (let ([n (- hierarchy-length minimum-hierarchy 1)])
+       (let ([n (- hierarchy-length min-hierarchy 1)])
          (if (< n 0)
              arg
              ((repeated raise n) arg))))
@@ -75,7 +76,7 @@
     (let ([proc (get op type-tags)])
       (if proc
           (apply proc (map contents args))
-          (let ([coerced-args (find-right-coercion args)])
+          (let ([coerced-args (coerce args)])
             (if coerced-args
                 (apply apply-generic (cons op coerced-args))
                 (error "No method for these types"
@@ -86,24 +87,24 @@
 (define (magnitude z) (apply-generic 'magnitude z))
 (define (angle z) (apply-generic 'angle z))
 
-(define (install-scheme-number-package)
+(define (install-integer-package)
   (define (tag x)
-    (attach-tag 'scheme-number x))
-  (put 'add '(scheme-number scheme-number)
+    (attach-tag 'integer x))
+  (put 'add '(integer integer)
        (lambda (x y) (tag (+ x y))))
-  (put 'sub '(scheme-number scheme-number)
+  (put 'sub '(integer integer)
        (lambda (x y) (tag (- x y))))
-  (put 'mul '(scheme-number scheme-number)
+  (put 'mul '(integer integer)
        (lambda (x y) (tag (* x y))))
-  (put 'div '(scheme-number scheme-number)
+  (put 'div '(integer integer)
        (lambda (x y) (tag (/ x y))))
-  (put 'exp '(scheme-number scheme-number)
+  (put 'exp '(integer integer)
        (lambda (x y) (tag (expt x y))))
-  (put 'equ? '(scheme-number scheme-number)
+  (put 'equ? '(integer integer)
        (lambda (x y) (= x y)))
-  (put 'zero? '(scheme-number)
+  (put 'zero? '(integer)
        (lambda (x) (= x 0)))
-  (put 'make 'scheme-number
+  (put 'make 'integer
        (lambda (x) (tag x)))
   'done)
 
@@ -263,7 +264,7 @@
        (lambda (r a) (tag (make-from-mag-ang r a))))
   'done)
 
-(install-scheme-number-package)
+(install-integer-package)
 (install-rational-package)
 (install-complex-package)
 
@@ -282,15 +283,15 @@
   ((get 'make-from-mag-ang 'complex) r a))
 
 ;; coercions could also go to the raise package
-(define (scheme-number->complex n)
+(define (integer->complex n)
   (make-complex-from-real-imag (contents n) 0))
 
-(put-coercion 'scheme-number 'complex scheme-number->complex)
+(put-coercion 'integer 'complex integer->complex)
 
-(define (scheme-number->rational n)
+(define (integer->rational n)
   (make-rational (contents n) 1))
 
-(put-coercion 'scheme-number 'rational scheme-number->rational)
+(put-coercion 'integer 'rational integer->rational)
 
 (define (rational->complex rat)
   (make-complex-from-real-imag ((get 'to-real 'rational) (contents rat)) 0))
@@ -317,7 +318,7 @@
 
     (loop base (list base)))
 
-  (put 'super 'scheme-number 'rational)
+  (put 'super 'integer 'rational)
   (put 'super 'rational 'complex)
   (put 'super 'complex null)
   (put 'raise 'hierarchy hierarchy)
@@ -332,8 +333,8 @@
 (raise (raise 1))
 (raise (raise (raise 1)))
 
-(hierarchy 'scheme-number)
+(hierarchy 'integer)
 (hierarchy 'complex)
-(find-right-coercion (list 1 (raise 1) (raise (raise 1))))
+(coerce (list 1 (raise 1) (raise (raise 1))))
 
 (add 1 (raise 1))
