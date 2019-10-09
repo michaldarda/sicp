@@ -78,7 +78,7 @@
           (apply proc (map contents args))
           (let ([coerced-args (coerce args)])
             (if coerced-args
-                (apply apply-generic (cons op coerced-args))
+                (drop (apply apply-generic (cons op coerced-args)))
                 (error "No method for these types"
                        (list op type-tags))))))))
 
@@ -268,9 +268,6 @@
   (define (tag z) (attach-tag 'complex z))
   (put 'add '(complex complex)
        (lambda (z1 z2) (tag (add-complex z1 z2))))
-  ;; its a separate procedure cause it would be hard
-  ;; to make general procedure that adds arbitrary num
-  ;; of arguments due to its type signature
   (put 'sub '(complex complex)
        (lambda (z1 z2) (tag (sub-complex z1 z2))))
   (put 'mul '(complex complex)
@@ -324,7 +321,9 @@
 (put-coercion 'real 'rational real->rational)
 
 (define (rational->complex rat)
-  (make-complex-from-real-imag ((get 'to-real 'rational) (contents rat)) 0))
+  (make-complex-from-real-imag ((get 'to-real 'rational)
+                                (contents rat))
+                               0))
 
 (put-coercion 'rational 'complex rational->complex)
 
@@ -401,17 +400,4 @@
 (define (hierarchy base) ((get 'raise 'hierarchy) base))
 (define (drop x) ((get 'raise 'drop) x))
 
-;; (~> (make-complex-from-mag-ang 1 0)
-;;     complex->rational
-;;     rational->real
-;;     real->integer)
-
-;; (define z1 (make-complex-from-mag-ang 1 0))
-;; (define z2 (~> z1
-;;                project
-;;                raise))
-
-;; (equ? z1 z2)
-
-(~> (make-complex-from-mag-ang 1 0)
-    drop)
+(add (make-complex-from-mag-ang 1 0) 1)

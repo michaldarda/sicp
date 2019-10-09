@@ -263,9 +263,6 @@
   (define (tag z) (attach-tag 'complex z))
   (put 'add '(complex complex)
        (lambda (z1 z2) (tag (add-complex z1 z2))))
-  ;; its a separate procedure cause it would be hard
-  ;; to make general procedure that adds arbitrary num
-  ;; of arguments due to its type signature
   (put 'sub '(complex complex)
        (lambda (z1 z2) (tag (sub-complex z1 z2))))
   (put 'mul '(complex complex)
