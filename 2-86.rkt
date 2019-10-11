@@ -1,7 +1,8 @@
 #lang racket
 (require threading)
 
-(define (square x) (* x x))
+(define (square x) (mul x x))
+(define (sqrt x) (exp 0.5 x))
 
 (define (compose f g)
   (lambda (x) (f (g x))))
@@ -87,6 +88,7 @@
 (define (magnitude z) (apply-generic 'magnitude z))
 (define (angle z) (apply-generic 'angle z))
 (define (sine x) (apply-generic 'sine x))
+(define (atan x y) (apply-generic 'atan x y))
 (define (cosine x) (apply-generic 'cosine x))
 
 (define (install-integer-package)
@@ -106,6 +108,8 @@
        (lambda (x y) (= x y)))
   (put 'zero? '(integer)
        (lambda (x) (= x 0)))
+  (put 'atan '(integer integer)
+       (lambda (x y) (atan x y)))
   (put 'make 'integer
        (lambda (x) (tag x)))
   (put 'sine '(integer)
@@ -135,6 +139,8 @@
        (lambda (x) (sin x)))
   (put 'cosine '(real)
        (lambda (x) (cos x)))
+  (put 'atan '(real real)
+       (lambda (x y) (atan x y)))
   (put 'make 'real
        (lambda (x) (tag (* x 1.0))))
   'done)
@@ -167,6 +173,8 @@
     (= (numer x) 0))
   ;; it does not coerce to any type, just makes
   ;; the division
+  (define (exp x n) (make-rat (exp (numer x) n)
+                              (exp (denom x) n)))
   (define (to-real x)
     (let ([numer (numer x)]
           [denom (denom x)])
@@ -185,9 +193,13 @@
   (put '=zero? '(rational) =zero?)
   (put 'to-real 'rational to-real)
   (put 'sine '(rational)
-       (lambda (x) (sin (to-real x))))
+       (lambda (x) (sin (/ (numer x) (denom x)))))
   (put 'cosine '(rational)
-       (lambda (x) (cos (to-real x))))
+       (lambda (x) (cos (/ (numer x) (denom x)))))
+  (put 'exp '(rational real) exp)
+  (put 'atan '(rational rational)
+       (lambda (x y) (atan (/ (numer x) (denom x))
+                           (/ (numer y) (denom y)))))
   (put 'make 'rational
        (lambda (n d) (tag (make-rat n d))))
   'done)
@@ -200,12 +212,12 @@
   (define (imag-part z) (cdr z))
   (define (make-from-real-imag x y) (cons x y))
   (define (magnitude z)
-    (sqrt (+ (square (real-part z))
-             (square (imag-part z)))))
+    (sqrt (add (square (real-part z))
+               (square (imag-part z)))))
   (define (angle z)
     (atan (imag-part z) (real-part z)))
   (define (make-from-mag-ang r a)
-    (cons (* r (cosine a)) (* r (sine a))))
+    (cons (mul r (cosine a)) (mul r (sine a))))
   ;; interface to the rest of the system
   (define (tag x) (attach-tag 'rectangular x))
   (put 'real-part '(rectangular) real-part)
@@ -421,5 +433,5 @@ z11
 (real-part z11)
 (imag-part z11)
 (sub z11 z11)
-;; (mul z11 z11)
-;; (div z11 z11)
+;;(mul z11 z11)
+;;(div z11 z11)
