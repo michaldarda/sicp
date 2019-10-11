@@ -88,7 +88,7 @@
 (define (magnitude z) (apply-generic 'magnitude z))
 (define (angle z) (apply-generic 'angle z))
 (define (sine x) (apply-generic 'sine x))
-(define (atan x y) (apply-generic 'atan x y))
+(define (atane x y) (apply-generic 'atane x y))
 (define (cosine x) (apply-generic 'cosine x))
 
 (define (install-integer-package)
@@ -108,7 +108,7 @@
        (lambda (x y) (= x y)))
   (put 'zero? '(integer)
        (lambda (x) (= x 0)))
-  (put 'atan '(integer integer)
+  (put 'atane '(integer integer)
        (lambda (x y) (atan x y)))
   (put 'make 'integer
        (lambda (x) (tag x)))
@@ -139,7 +139,7 @@
        (lambda (x) (sin x)))
   (put 'cosine '(real)
        (lambda (x) (cos x)))
-  (put 'atan '(real real)
+  (put 'atane '(real real)
        (lambda (x y) (atan x y)))
   (put 'make 'real
        (lambda (x) (tag (* x 1.0))))
@@ -197,9 +197,9 @@
   (put 'cosine '(rational)
        (lambda (x) (cos (/ (numer x) (denom x)))))
   (put 'exp '(rational real) exp)
-  (put 'atan '(rational rational)
-       (lambda (x y) (atan (/ (numer x) (denom x))
-                           (/ (numer y) (denom y)))))
+  (put 'atane '(rational rational)
+       (lambda (x y) (atane (/ (numer x) (denom x))
+                            (/ (numer y) (denom y)))))
   (put 'make 'rational
        (lambda (n d) (tag (make-rat n d))))
   'done)
@@ -215,7 +215,7 @@
     (sqrt (add (square (real-part z))
                (square (imag-part z)))))
   (define (angle z)
-    (atan (imag-part z) (real-part z)))
+    (atane (imag-part z) (real-part z)))
   (define (make-from-mag-ang r a)
     (cons (mul r (cosine a)) (mul r (sine a))))
   ;; interface to the rest of the system
@@ -433,5 +433,6 @@ z11
 (real-part z11)
 (imag-part z11)
 (sub z11 z11)
-;;(mul z11 z11)
-;;(div z11 z11)
+(magnitude z11)
+(mul z11 z11)
+(div z11 z11)
