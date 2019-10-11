@@ -14,3 +14,4 @@ in infinite loop where in my implementation it correctly reports that no such pr
 is found for this types.
 
 ** TODO 2-82 Find a case when find-right-coercion procedure fails is not working
+** TODO 2-86 modify sub, mul, div
