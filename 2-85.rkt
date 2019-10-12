@@ -72,13 +72,29 @@
      hierarchies-length)))
 
 (define (apply-generic op . args)
+  ;; trys to drop value, if it fails
+  ;; returns the original value
+
+  ;; it is maybe not a great example of
+  ;; programming style, but not all types
+  ;; are 'droppable', such as booleans
+  ;; that are returned by equ? function
+
+  ;; other way to do that would be to
+  ;; introduce custom boolean type
+  ;; or add clauses to type-tag and contents
+  ;; methods
+  (define (try-drop value)
+    (with-handlers ([exn:fail? (lambda (exn) value)])
+      (drop value)))
+
   (let ([type-tags (map type-tag args)])
     (let ([proc (get op type-tags)])
       (if proc
-          (apply proc (map contents args))
+          (try-drop (apply proc (map contents args)))
           (let ([coerced-args (coerce args)])
             (if coerced-args
-                (drop (apply apply-generic (cons op coerced-args)))
+                (try-drop (apply apply-generic (cons op coerced-args)))
                 (error "No method for these types"
                        (list op type-tags))))))))
 
@@ -400,4 +416,5 @@
 (define (hierarchy base) ((get 'raise 'hierarchy) base))
 (define (drop x) ((get 'raise 'drop) x))
 
+(add (make-real 1.0) (make-real 1.0))
 (add (make-complex-from-mag-ang 1 0) 1)
