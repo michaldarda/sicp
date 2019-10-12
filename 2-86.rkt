@@ -14,6 +14,8 @@
 
   (loop identity n))
 
+;; operations not defined in SICP
+
 (define *op-table* (make-weak-hash))
 
 (define (put op type proc)
@@ -38,7 +40,7 @@
 (define (get-subtype type)
   (get 'subtype type))
 
-;;
+;; framework
 
 (define (attach-tag type-tag contents)
   (if (eq? type-tag 'integer)
@@ -87,13 +89,7 @@
                 (error "No method for these types"
                        (list op type-tags))))))))
 
-(define (real-part z) (apply-generic 'real-part z))
-(define (imag-part z) (apply-generic 'imag-part z))
-(define (magnitude z) (apply-generic 'magnitude z))
-(define (angle z) (apply-generic 'angle z))
-(define (sine x) (apply-generic 'sine x))
-(define (atane x y) (apply-generic 'atane x y))
-(define (cosine x) (apply-generic 'cosine x))
+;; packages
 
 (define (install-integer-package)
   (define (tag x)
@@ -262,9 +258,6 @@
        (lambda (r a) (tag (make-from-mag-ang r a))))
   'done)
 
-(install-rectangular-package)
-(install-polar-package)
-
 (define (install-complex-package)
   ;; imported procedures from rectangular and polar packages
   (define (make-from-real-imag x y)
@@ -316,64 +309,6 @@
   (put 'angle '(complex) angle)
   'done)
 
-(install-integer-package)
-(install-real-package)
-(install-rational-package)
-(install-complex-package)
-
-(define (add x y) (apply-generic 'add x y))
-(define (sub x y) (apply-generic 'sub x y))
-(define (mul x y) (apply-generic 'mul x y))
-(define (div x y) (apply-generic 'div x y))
-(define (equ? x y) (apply-generic 'equ? x y))
-(define (=zero? x) (apply-generic '=zero? x))
-(define (exp x y) (apply-generic 'exp x y))
-
-(define (make-real x)
-  ((get 'make 'real) x))
-
-(define (make-complex-from-real-imag x y)
-  ((get 'make-from-real-imag 'complex) x y))
-
-(define (make-complex-from-mag-ang r a)
-  ((get 'make-from-mag-ang 'complex) r a))
-
-;; way to push types up in the tower
-
-(define (integer->real n)
-  (make-real (contents n)))
-
-(put-coercion 'integer 'real integer->real)
-
-(define (real->rational n)
-  (make-rational (contents n) 1))
-
-(put-coercion 'real 'rational real->rational)
-
-(define (rational->complex rat)
-  (make-complex-from-real-imag ((get 'to-real 'rational)
-                                (contents rat))
-                               0))
-
-(put-coercion 'rational 'complex rational->complex)
-
-;; way to push types down in the tower
-
-(define (complex->rational z)
-  (make-rational (real-part z) 1))
-
-(put-coercion 'complex 'rational complex->rational)
-
-(define (rational->real n)
-  (make-real ((get 'to-real 'rational) (contents n))))
-
-(put-coercion 'rational 'real rational->real)
-
-(define (real->integer n)
-  (inexact->exact (floor (contents n))))
-
-(put-coercion 'real 'integer real->integer)
-
 (define (install-raise-package)
   (define (raise val)
     (letrec ([type (type-tag val)]
@@ -423,12 +358,79 @@
   (put 'raise 'drop drop)
   'done)
 
-(install-raise-package)
+;; generic functions and costructors
 
+(define (real-part z) (apply-generic 'real-part z))
+(define (imag-part z) (apply-generic 'imag-part z))
+(define (magnitude z) (apply-generic 'magnitude z))
+(define (angle z) (apply-generic 'angle z))
+(define (sine x) (apply-generic 'sine x))
+(define (atane x y) (apply-generic 'atane x y))
+(define (cosine x) (apply-generic 'cosine x))
+(define (add x y) (apply-generic 'add x y))
+(define (sub x y) (apply-generic 'sub x y))
+(define (mul x y) (apply-generic 'mul x y))
+(define (div x y) (apply-generic 'div x y))
+(define (equ? x y) (apply-generic 'equ? x y))
+(define (=zero? x) (apply-generic '=zero? x))
+(define (exp x y) (apply-generic 'exp x y))
 (define (raise x) ((get 'raise 'raise) x))
 (define (project x) ((get 'raise 'project) x))
 (define (hierarchy base) ((get 'raise 'hierarchy) base))
 (define (drop x) ((get 'raise 'drop) x))
+
+(define (make-real x)
+  ((get 'make 'real) x))
+
+(define (make-complex-from-real-imag x y)
+  ((get 'make-from-real-imag 'complex) x y))
+
+(define (make-complex-from-mag-ang r a)
+  ((get 'make-from-mag-ang 'complex) r a))
+
+;; coercions up the tower
+
+(define (integer->real n)
+  (make-real (contents n)))
+
+(put-coercion 'integer 'real integer->real)
+
+(define (real->rational n)
+  (make-rational (contents n) 1))
+
+(put-coercion 'real 'rational real->rational)
+
+(define (rational->complex rat)
+  (make-complex-from-real-imag ((get 'to-real 'rational)
+                                (contents rat))
+                               0))
+
+(put-coercion 'rational 'complex rational->complex)
+
+;; coercions down the tower
+
+(define (complex->rational z)
+  (make-rational (real-part z) 1))
+
+(put-coercion 'complex 'rational complex->rational)
+
+(define (rational->real n)
+  (make-real ((get 'to-real 'rational) (contents n))))
+
+(put-coercion 'rational 'real rational->real)
+
+(define (real->integer n)
+  (inexact->exact (floor (contents n))))
+
+(put-coercion 'real 'integer real->integer)
+
+(install-integer-package)
+(install-real-package)
+(install-rational-package)
+(install-rectangular-package)
+(install-polar-package)
+(install-complex-package)
+(install-raise-package)
 
 (define z1 (make-complex-from-mag-ang (make-rational 1 2) 1))
 
