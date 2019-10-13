@@ -24,6 +24,8 @@
   (hash-set! *op-table* (list op type) proc))
 
 (define (get op type)
+  (display op)
+  (display type)
   (hash-ref *op-table* (list op type) #f))
 
 (define (put-coercion source-type target-type proc)
@@ -60,6 +62,7 @@
         [else (error "Bad tagged datum -- CONTENTS" datum)]))
 
 (define (coerce args)
+  (display "coerce")
   (letrec ([hierarchies-length
             (map (lambda (a) (length (hierarchy a))) (map type-tag args))]
            [min-hierarchy (apply min hierarchies-length)])
@@ -514,10 +517,10 @@
 
 (put-coercion 'rational 'complex rational->complex)
 
-(define (complex->polynomial c)
-  (make-polynomial 'x (list (0 c))))
+;; (define (complex->polynomial c)
+;;   (make-polynomial 'x (list (0 c))))
 
-(put-coercion 'complex 'polynomial complex->polynomial)
+;; (put-coercion 'complex 'polynomial complex->polynomial)
 
 ;; coercions down the tower
 
@@ -548,7 +551,8 @@
 (define p1 (make-polynomial 'x (list (cons 1 1))))
 (define p2 (make-polynomial 'x (list (cons 1 0))))
 
-;; (mul p1 p1)
+(add p1 p2)
+;(coerce (list p1 p2))
 
-(=zero? p1)
-(=zero? p2)
+;(=zero? p1)
+;(=zero? p2)
