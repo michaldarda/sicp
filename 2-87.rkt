@@ -403,7 +403,7 @@
   (define (make-term order coeff)
     (list order coeff))
   (define (order term) (car term))
-  (define (coeff term) (cdr term))
+  (define (coeff term) (cadr term))
 
   (define (add-terms L1 L2)
     (cond [(empty-termlist? L1) L2]
@@ -546,12 +546,13 @@
 (install-raise-package)
 (install-polynomial-package)
 
-(define p1 (make-polynomial 'x (list (cons 1 1))))
-(define p2 (make-polynomial 'x (list (cons 1 0))))
+(define p1 (make-polynomial 'x (list (list 1 1))))
+(define p2 (make-polynomial 'x (list (list 1 0))))
 p1
 p2
 (add p1 p1)
-;(mul p1 p2)
+(mul p1 p2)
+(mul p2 p2)
 
 ;(=zero? p1)
 ;(=zero? p2)
