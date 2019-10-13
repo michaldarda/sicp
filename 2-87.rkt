@@ -24,8 +24,6 @@
   (hash-set! *op-table* (list op type) proc))
 
 (define (get op type)
-  (display op)
-  (display type)
   (hash-ref *op-table* (list op type) #f))
 
 (define (put-coercion source-type target-type proc)
@@ -62,7 +60,6 @@
         [else (error "Bad tagged datum -- CONTENTS" datum)]))
 
 (define (coerce args)
-  (display "coerce")
   (letrec ([hierarchies-length
             (map (lambda (a) (length (hierarchy a))) (map type-tag args))]
            [min-hierarchy (apply min hierarchies-length)])
@@ -349,17 +346,19 @@
 
   (define (drop val)
     (let ([subtype (get-subtype (type-tag val))])
-      (if (not subtype)
-          val
+      (display subtype)
+      (if subtype
           (let ([vall (project val)])
             (if (equ? val (raise vall))
                 (drop vall)
-                val)))))
+                val))
+          val)))
+
 
   (define (hierarchy base)
     (define (loop base acc)
       (let ([super-type (get 'super base)])
-        (if (null? super-type)
+        (if (false? super-type)
             acc
             (loop super-type (append acc (list super-type))))))
 
@@ -368,7 +367,7 @@
   (put-super 'integer 'real)
   (put-super 'real 'rational)
   (put-super 'rational 'complex)
-  (put-super 'complex null)
+  ;(put-super 'complex null)
   (put 'raise 'hierarchy hierarchy)
   (put 'raise 'raise raise)
   (put 'raise 'project project)
@@ -550,9 +549,12 @@
 
 (define p1 (make-polynomial 'x (list (cons 1 1))))
 (define p2 (make-polynomial 'x (list (cons 1 0))))
-
-(add p1 p2)
-;(coerce (list p1 p2))
+p1
+p2
+(add p1 p1)
+(coerce (list p1 p2))
+(drop p1)
+;(mul p1 p2)
 
 ;(=zero? p1)
 ;(=zero? p2)
