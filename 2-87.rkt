@@ -551,8 +551,5 @@
 p1
 p2
 (add p1 p1)
-(mul p1 p2)
-(mul p2 p2)
-
-;(=zero? p1)
-;(=zero? p2)
+(=zero? (mul p2 p2))
+(mul p1 p1)
