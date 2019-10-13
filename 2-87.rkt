@@ -346,7 +346,6 @@
 
   (define (drop val)
     (let ([subtype (get-subtype (type-tag val))])
-      (display subtype)
       (if subtype
           (let ([vall (project val)])
             (if (equ? val (raise vall))
@@ -552,8 +551,6 @@
 p1
 p2
 (add p1 p1)
-(coerce (list p1 p2))
-(drop p1)
 ;(mul p1 p2)
 
 ;(=zero? p1)
