@@ -568,6 +568,7 @@
 (define p3 (negate p1))
 
 ;; polynomials are not presented in simplest form
+(add p1 p1)
 (add p1 p3)
 (sub p1 p3)
 (sub p1 p1)
