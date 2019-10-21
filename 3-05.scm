@@ -1,3 +1,9 @@
+(import (chicken random))
+
+(define random pseudo-random-integer)
+
+(define random-init 2137)
+
 (define (rand-update x)
   (let ((m (expt 2 32))
         (a 1664525)
