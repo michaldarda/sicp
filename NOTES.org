@@ -18,3 +18,5 @@ is found for this types.
 ** TODO In 2-87 I introduced some changes to drop, hierarchy procedures,
 which might have been introduced earlier. Purpose of these changes is to be able to handle
 types that are not part of the central type tower.
+
+** TODO get back finish 2-90 > till section 3
