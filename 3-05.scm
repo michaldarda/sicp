@@ -1,13 +1,16 @@
-(import (chicken random))
-
-(define random pseudo-random-integer)
+(define (rand-update x)
+  (let ((m (expt 2 32))
+        (a 1664525)
+        (b 1013904423))
+    (remainder (+ (* a x) b) m)))
 
 (define (random-in-range low high)
   (let ((range (- high low)))
     (+ low (random range))))
 
-(define (rand)
-  (random 10000))
+(define rand
+  (let ((x random-init))
+    (lambda () (set! x (rand-update x)) x)))
 
 (define (monte-carlo trials experiment)
   (define (iter trials-remaining trials-passed)
