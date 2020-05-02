@@ -49,15 +49,16 @@
 (define (square x)
   (* x x))
 
-(define P (lambda (x y)
-            (<=
-             (+ (square (- x 5))
-                (square (- y 7)))
-             (square 3))))
 
 ;; pi r^2 = computed
+;; r = 3
 ;; computed/(3^2)
 (define (estimate-pi2 trials)
+  (define P (lambda (x y)
+              (<=
+               (+ (square (- x 5))
+                  (square (- y 7)))
+               (square 3))))
   (let ([estimated-integral
          (exact->inexact
           (estimate-integral P 2 8 4 10 trials))])
