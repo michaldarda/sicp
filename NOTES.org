@@ -20,3 +20,5 @@ which might have been introduced earlier. Purpose of these changes is to be able
 types that are not part of the central type tower.
 
 ** TODO get back finish 2-90 > till section 3
+
+** TODO get back and finish 3.10 and 3.11
