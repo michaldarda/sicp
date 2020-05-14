@@ -68,3 +68,8 @@
 (insert-queue! x 2)
 
 (print-queue x)
+
+;; using let as source of local state
+;; allows easier representation, I don't need to
+;; use set-cdr! etc. and complex operations
+;; its easier to just access front-ptr and rear-ptr
