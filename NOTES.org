@@ -22,3 +22,6 @@ types that are not part of the central type tower.
 ** TODO get back finish 2-90 > till section 3
 
 ** TODO 3-18 probably does not cover all cases, I focused only on the cycle example from the 3-13
+  or simpler version
+** TODO 3-19 There is algorithm for that, search for wikipedia for Cycle Detect
+** TODO 3-20
