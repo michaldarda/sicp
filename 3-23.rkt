@@ -18,9 +18,9 @@
         (cond [(empty-deque?)
                (set! front-ptr new-pair)
                (set! rear-ptr new-pair)]
-              [else (set-cdr! rear-ptr new-pair)
-                    (set! rear-ptr new-pair)])))
-    (define (rear-insert-deeue! item)
+              [else (set-cdr! new-pair front-ptr)
+                    (set! front-ptr new-pair)])))
+    (define (rear-insert-deque! item)
       (let ([new-pair (cons item '())])
         (cond [(empty-deque?)
                (set! front-ptr new-pair)
@@ -79,5 +79,6 @@
 
 (front-insert-deque! x 1)
 (front-insert-deque! x 2)
+(rear-insert-deque! x 3)
 
 (print-deque x)
