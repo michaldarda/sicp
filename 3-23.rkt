@@ -32,11 +32,7 @@
              (error "DELETE called with an empty deque")]
             [else (set! front-ptr
                         (cdr front-ptr))]))
-    (define (rear-delete-deque!)
-      (cond [(empty-deque?)
-             (error "DELETE called with an empty deque")]
-            [else (set! front-ptr
-                        (cdr front-ptr))]))
+    (define (rear-delete-deque!)) ;; TODO
     (define (print-deque)
       (display front-ptr))
     (define (dispatch m)
