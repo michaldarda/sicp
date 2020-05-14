@@ -25,3 +25,7 @@
 ;; loop ('c 'd) (list 'b 'a)
 
 ;; so this fn reverses a list
+
+;; (mystery v) returns ('d 'c 'b 'a)
+
+;; and value of v is 'a (last set-cdr! x y)
