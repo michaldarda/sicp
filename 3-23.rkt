@@ -24,15 +24,21 @@
                (set! front-ptr new-pair)
                (set! rear-ptr new-pair)]
               [else (set-cdr! rear-ptr new-pair)
-                    (set! rear-ptr new-pair)])))
+                    (set! rear-ptr (cons new-pair rear-ptr))])))
     (define (front-delete-deque!)
       (cond [(empty-deque?)
              (error "DELETE called with an empty deque")]
             [else (set! front-ptr
                         (cdr front-ptr))]))
-    (define (rear-delete-deque!) '()) ;; TODO
+    (define (rear-delete-deque!)
+      (cond [(empty-deque?)
+             (error "DELETE called with an empty deque")]
+            [else (set! rear-ptr (cdr rear-ptr))
+                  (set-cdr! rear-ptr '())]))
     (define (print-deque)
-      (display front-ptr))
+      (display front-ptr)
+      (display "#")
+      (display rear-ptr))
     (define (dispatch m)
       (cond [(eq? m 'empty-deque?) empty-deque?]
             [(eq? m 'front-deque) front-deque]
@@ -74,7 +80,7 @@
 (front-insert-deque! x 1)
 (front-insert-deque! x 2)
 (rear-insert-deque! x 3)
-(front-delete-deque! x)
-;; (rear-delete-deque! x)
+;; (front-delete-deque! x)
+(rear-delete-deque! x)
 
 (print-deque x)
