@@ -80,7 +80,8 @@
 (front-insert-deque! x 1)
 (front-insert-deque! x 2)
 (rear-insert-deque! x 3)
-;; (front-delete-deque! x)
+(front-delete-deque! x)
+(rear-delete-deque! x)
 (rear-delete-deque! x)
 
 (print-deque x)
