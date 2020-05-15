@@ -1,7 +1,5 @@
 #lang sicp
 
-(define ??? '())
-
 (define (make-deque)
   (let [(front-ptr '())
         (rear-ptr '())]
@@ -12,7 +10,7 @@
           (error "FRONT called with an
               empty deque ")
           (car front-ptr)))
-    (define (rear-deque?) ???)
+    (define (rear-deque?) '())
     (define (front-insert-deque! item)
       (let ([new-pair (cons item '())])
         (cond [(empty-deque?)
@@ -32,7 +30,7 @@
              (error "DELETE called with an empty deque")]
             [else (set! front-ptr
                         (cdr front-ptr))]))
-    (define (rear-delete-deque!)) ;; TODO
+    (define (rear-delete-deque!) '()) ;; TODO
     (define (print-deque)
       (display front-ptr))
     (define (dispatch m)
@@ -77,5 +75,6 @@
 (front-insert-deque! x 2)
 (rear-insert-deque! x 3)
 (front-delete-deque! x)
+;; (rear-delete-deque! x)
 
 (print-deque x)
