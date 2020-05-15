@@ -34,7 +34,9 @@
       (cond [(empty-deque?)
              (error "DELETE called with an empty deque")]
             [else (set! rear-ptr (cdr rear-ptr))
-                  (set-cdr! rear-ptr '())]))
+                  (if (pair? rear-ptr)
+                      (set-cdr! rear-ptr '())
+                      (set! front-ptr '()))]))
     (define (print-deque)
       (display front-ptr)
       (display "#")
@@ -83,5 +85,7 @@
 (front-delete-deque! x)
 (rear-delete-deque! x)
 (rear-delete-deque! x)
+(front-insert-deque! x 2)
+;; (rear-delete-deque! x)
 
 (print-deque x)
