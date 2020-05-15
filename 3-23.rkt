@@ -10,7 +10,11 @@
           (error "FRONT called with an
               empty deque ")
           (car front-ptr)))
-    (define (rear-deque?) '())
+    (define (rear-deque)
+      (if (empty-deque?)
+          (error "REAR called with an
+              empty deque ")
+          (car rear-ptr)))
     (define (front-insert-deque! item)
       (let ([new-pair (cons item '())])
         (cond [(empty-deque?)
@@ -39,7 +43,7 @@
                       (set! front-ptr '()))]))
     (define (print-deque)
       (display front-ptr)
-      (display "#")
+      (display "#REAR")
       (display rear-ptr))
     (define (dispatch m)
       (cond [(eq? m 'empty-deque?) empty-deque?]
@@ -80,12 +84,15 @@
 (define x (make-deque))
 
 (front-insert-deque! x 1)
+(rear-deque x)
 (front-insert-deque! x 2)
+(rear-deque x)
 (rear-insert-deque! x 3)
 (front-delete-deque! x)
 (rear-delete-deque! x)
 (rear-delete-deque! x)
 (front-insert-deque! x 2)
-;; (rear-delete-deque! x)
+
+(rear-deque x)
 
 (print-deque x)
