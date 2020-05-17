@@ -62,17 +62,38 @@
         (set-cdr! table (insert-tree key value (cdr table)))))
   'ok)
 
+(define (compare a b)
+  (cond [(< a b) 1]
+        [(> a b) -1]
+        [else 0]))
+
 (define (make-table)
   (list '*table*))
 
-(define (compare char-a char-b)
-  (let ([charcode-a (char->integer char-a)]
-        [charcode-b (char->integer char-b)])
-    (cond [(< charcode-a charcode-b) 1]
-          [(> charcode-a charcode-b) -1]
-          [else 0])))
+;;
 
-(define x (make-table))
+(define (memoize f)
+  (let ([table (make-table)])
+    (lambda (x)
+      (let ([memoized (lookup x table)])
+        (or memoized
+            (let ([result (f x)])
+              (insert! x result table)
+              result))))))
 
-(insert! #\A 1 x)
-(lookup #\A x)
+(define (fib n)
+  (cond [(= n 0) 0]
+        [(= n 1) 1]
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
+
+(define memo-fib
+  (memoize
+   (lambda (n)
+     (cond [(= n 0) 0]
+           [(= n 1) 1]
+           [else
+            (+ (memo-fib (- n 1))
+               (memo-fib (- n 2)))]))))
+
+(memo-fib 38)
