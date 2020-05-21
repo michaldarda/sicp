@@ -1,26 +1,8 @@
 #lang sicp
 
-(define (make-wire)
-  (cons 0 '()))
-(define get-signal car)
-(define set-signal! set-cdr!)
+(#%require racket/include)
+(include "wire.rkt")
 
-(define (add-action! wire action)
-  (let ([actions (car wire)])
-    (set-cdr! wire (cons action actions))))
-
-(define (sleep time)
-  (let ([start (runtime)])
-    (define (loop)
-      (let ([elapsed (- (runtime) start)])
-        (if (< elapsed time)
-            (loop))))
-    (loop)))
-
-
-(define (after-delay delay f)
-  (sleep delay)
-  f)
 
 (define (logical-and a b)
   (if (eq? a b) a 0))
@@ -30,9 +12,6 @@
   (cond [(eq? a 1) 1]
         [(eq? b 1) 1]
         [else 0]))
-
-(define and-gate-delay 0)
-(define or-gate-delay 0)
 
 (define a (make-wire))
 (define b (make-wire))
@@ -62,3 +41,10 @@
          (set-signal! output new-value)))))
   (add-action! a1 or-action-procedure)
   (add-action! a2 or-action-procedure))
+
+(probe 'c c)
+
+(or-gate a b c)
+
+(set-signal! b 1)
+(propagate)
