@@ -25,3 +25,6 @@ types that are not part of the central type tower.
   or simpler version
 ** TODO 3-19 There is algorithm for that, search for wikipedia for Cycle Detect
 ** TODO 3-20
+** TODO 3-30 not sure if this is correct verify on more binary numbers
+** TODO Understand agenda code, in the 3.3.4 A Simulator for Digital Circuits
+** TODO Finish 3-31 3-32
