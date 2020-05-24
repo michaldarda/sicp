@@ -91,6 +91,7 @@
     (cond [(eq? request 'I-have-a-value) (process-new-value)]
           [(eq? request 'I-lost-my-value) (process-forget-value)]
           [else (error "Unknown request: PROBE" request)]))
+  (connect connector me)
   me)
 
 (define (inform-about-value constraint)
@@ -151,3 +152,29 @@
 
 (define (connect connector new-constraint)
   ((connector 'connect) new-constraint))
+
+;; usage
+
+(define C (make-connector))
+(define F (make-connector))
+
+(define (celsius-fahreinheit-converter c f)
+  (let ([u (make-connector)]
+        [v (make-connector)]
+        [w (make-connector)]
+        [x (make-connector)]
+        [y (make-connector)])
+    (multiplier c w u)
+    (multiplier v x u)
+    (adder v y f)
+    (constant 9 w)
+    (constant 5 x)
+    (constant 32 y)
+    'ok))
+
+(celsius-fahreinheit-converter C F)
+
+(probe "Celsius temp" C)
+(probe "Celsius temp" F)
+
+(set-value! C 25 'user)
