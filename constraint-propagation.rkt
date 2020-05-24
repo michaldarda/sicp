@@ -175,6 +175,7 @@
 (celsius-fahreinheit-converter C F)
 
 (probe "Celsius temp" C)
-(probe "Celsius temp" F)
+(probe "Fahrenheit temp" F)
+
 
 (set-value! C 25 'user)
