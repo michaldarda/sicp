@@ -1,9 +1,7 @@
-#lang sicp
-
 (define (for-each-except exception procedure list)
   (define (loop items)
     (cond [(null? items) 'done]
-          [(eq? (car items) exception) (loop (cdr list))]
+          [(eq? (car items) exception) (loop (cdr items))]
           [else (procedure (car items))
                 (loop (cdr items))]))
   (loop list))
@@ -98,7 +96,7 @@
   (constraint 'I-have-a-value))
 
 (define (inform-about-no-value constraint)
-  (constraint 'I-list-my-value))
+  (constraint 'I-lost-my-value))
 
 (define (make-connector)
   (let ([value false]
@@ -154,28 +152,3 @@
   ((connector 'connect) new-constraint))
 
 ;; usage
-
-(define C (make-connector))
-(define F (make-connector))
-
-(define (celsius-fahreinheit-converter c f)
-  (let ([u (make-connector)]
-        [v (make-connector)]
-        [w (make-connector)]
-        [x (make-connector)]
-        [y (make-connector)])
-    (multiplier c w u)
-    (multiplier v x u)
-    (adder v y f)
-    (constant 9 w)
-    (constant 5 x)
-    (constant 32 y)
-    'ok))
-
-(celsius-fahreinheit-converter C F)
-
-(probe "Celsius temp" C)
-(probe "Fahrenheit temp" F)
-
-
-(set-value! C 25 'user)
