@@ -8,6 +8,27 @@
                 (loop (cdr items))]))
   (loop list))
 
+(define (constant value connector)
+  (define (me request)
+    (error "Unknown request: CONTANT" request))
+  (connect connector me)
+  (set-value! connector value me)
+  me)
+
+(define (probe name connector)
+  (define (print-probe value)
+    (newline) (display "Probe: ") (display name)
+    (display " = ") (display value))
+  (define (process-new-value)
+    (print-probe (get-value connector)))
+  (define (process-forget-value)
+    (print-probe "?"))
+  (define (me request)
+    (cond [(eq? request 'I-have-a-value) (process-new-value)]
+          [(eq? request 'I-lost-my-value) (process-forget-value)]
+          [else (error "Unknown request: PROBE" request)]))
+  me)
+
 (define (inform-about-value constraint)
   (constraint 'I-have-a-value))
 
@@ -58,7 +79,7 @@
 (define (get-value connector)
   (connector 'value))
 
-(define (set-value connector new-value informant)
+(define (set-value! connector new-value informant)
   ((connector 'set-value!) new-value informant))
 
 (define (forget-value! connector retractor)
