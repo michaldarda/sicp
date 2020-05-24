@@ -15,6 +15,38 @@
   (set-value! connector value me)
   me)
 
+(define (adder a1 a2 sum)
+  (define (process-new-value)
+    (cond [(or (and (has-value? a1) (= (get-value a1) 0))
+               (and (has-value? a2) (= (get-value a2) 0)))
+           (set-value! sum 0 me)]
+          [(and (has-value? a1) (has-value? a2))
+           (set-value! sum
+                       (+ (get-value a1) (get-value a2))
+                       me)]
+          [(and (has-value? sum) (has-value? a1))
+           (set-value! a2
+                       (- (get-value sum)
+                          (get-value a1))
+                       me)]
+          [(and (has-value? sum) (has-value? a2))
+           (set-value! a1
+                       (- (get-value sum)
+                          (get-value a2))
+                       me)]))
+  (define (process-forget-value)
+    (forget-value! sum me)
+    (forget-value! a1 me)
+    (forget-value! a2 me))
+  (define (me request)
+    (cond [(eq? request 'I-have-a-value) (process-new-value)]
+          [(eq? request 'I-lost-my-value) (process-forget-value)]
+          [else (error "Unknown request MULTIPLIER" request)]))
+  (connect a1 me)
+  (connect a2 me)
+  (connect sum me)
+  me)
+
 (define (multiplier m1 m2 product)
   (define (process-new-value)
     (cond [(or (and (has-value? m1) (= (get-value m1) 0))
